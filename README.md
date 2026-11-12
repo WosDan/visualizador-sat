@@ -1,49 +1,47 @@
 # Laboratorio SAT · Separating Axis Theorem (2D & 3D)
 
-Visualizador interactivo en tiempo real para explorar el **Teorema del Eje Separador (Separating Axis Theorem - SAT)** en dos y tres dimensiones con representación vectorial de ejes locales, productos cruzados y proyecciones ortogonales escalares por producto punto.
+Visualizador interactivo en tiempo real para explorar y calcular matemáticamente el **Teorema del Eje Separador (Separating Axis Theorem - SAT)** sobre un plano cartesiano graduado con coordenadas explícitas, productos cruzados y proyecciones por producto punto.
 
 🌐 **Demo en línea**: [https://wosdan.github.io/visualizador-sat/](https://wosdan.github.io/visualizador-sat/)
 
 ---
 
-## 🚀 Características y Novedades
+## 🚀 Características Matemáticas
 
-- **Vectores de Ejes en las Figuras:**
-  - **En 3D:** Cada caja orientada (OBB) despliega sus tres ejes principales locales ($X, Y, Z$) con flechas vectoriales codificadas por color, destacando en amarillo dorado el eje que interviene en la prueba activa.
-  - **En 2D:** Muestra los ejes de orientación locales en el centroide y las normales exteriores en cada arista del polígono.
+- **Plano Cartesiano Graduado (2D y 3D):**
+  - **En 2D:** Ejes principales horizontal ($X$) y vertical ($Y$) con marcas graduadas cada 50 unidades, origen $(0, 0)$ y flechas de orientación.
+  - **En 3D:** Espacio cartesiano tridimensional con plano de tierra graduado en $Y = 0$, ejes globales $+X$ (rojo), $+Y$ (verde) y $+Z$ (azul) con valores numéricos visibles en los tres ejes y origen $(0, 0, 0)$.
 
-- **Visualización Geométrica del Producto Cruz ($\vec{u} \times \vec{v}$):**
-  - Identifica y resalta el vector director de arista $\vec{u}$ en la Figura A y $\vec{v}$ en la Figura B.
-  - Construye en el centro del espacio el paralelogramo que generan $\vec{u}$ y $\vec{v}$.
-  - Dibuja el **vector resultante del producto cruz** $\vec{C} = \vec{u} \times \vec{v}$ (y su normalizado $\vec{n} = \frac{\vec{C}}{\|\vec{C}\|}$) con flecha verde esmeralda y marca de ángulo recto ($\perp$).
+- **Valores Numéricos Visibles para Cálculo Manual:**
+  - **Centros de figuras:** Coordenadas cartesianas en vivo $(X, Y)$ en 2D y $[X, Y, Z]$ en 3D.
+  - **Vértices:** Cada vértice de las Figuras A y B muestra su etiqueta y coordenadas exactas (ej: $P_1(-88, -54)$ o $v_1[-1.60, 0.86, -0.35]$).
+  - **Vectores de Ejes y Aristas:** Muestran sus componentes $(\Delta x, \Delta y)$ y vector unitario $\vec{n} = (n_x, n_y)$.
+  - **Producto Cruz:** Componentes explícitos de $\vec{u}$, $\vec{v}$, $\vec{C} = \vec{u} \times \vec{v}$, magnitud $\|\vec{C}\|$ y normalizado $\vec{n}$.
+  - **Proyecciones Escalares:** Cada punto proyectado sobre el eje muestra su valor escalar $p = \vec{v} \cdot \vec{n}$, así como los límites del intervalo $[\min_A, \max_A]$ y $[\min_B, \max_B]$.
 
-- **Proyección mediante Producto Punto ($\vec{v}_k \cdot \vec{n}$):**
-  - Muestra en el espacio 3D las líneas de proyección ortogonales desde los 8 vértices de cada caja hacia la recta del eje.
-  - Genera los intervalos continuos $[\min_A, \max_A]$ y $[\min_B, \max_B]$ directamente en 3D y en la gráfica inferior.
-
-- **Consola Matemática Detallada:**
-  - Desglose componente a componente del producto cruz y del producto punto con verificación de condición de solapamiento estricto.
+- **Consola Matemática Paso a Paso:**
+  - Desglose aritmético explícito: multiplica cada componente del vértice por el vector del eje y suma los términos para verificar manualmente con lápiz y papel o calculadora.
 
 ---
 
 ## 🎮 Controles
 
-| Acción | Control |
+| Botón / Control | Descripción |
 |---|---|
-| **Mover figuras** | Clic y arrastrar sobre la figura deseada |
-| **Rotar figura B** | Deslizador "Rotar B" en la barra de herramientas |
-| **Inspeccionar eje** | Clic en cualquier botón del listado derecho |
-| **Siguiente eje** | Botón "Siguiente eje →" |
-| **Alternar vectores de ejes** | Botón "Ejes en figuras: ON/OFF" |
-| **Alternar proyecciones 3D** | Botón "Proyecciones 3D: ON/OFF" |
+| **Plano cartesiano: ON/OFF** | Alterna los ejes coordenados y marcas graduadas de la grilla |
+| **Valores numéricos: ON/OFF** | Alterna las coordenadas $(x, y, z)$ en vértices, centros y proyecciones |
+| **Ejes figuras: ON/OFF** | Muestra los ejes de rotación local en el centro de las figuras |
+| **Proyecciones 3D: ON/OFF** | Muestra los rayos ortogonales e intervalos de sombra en 3D |
+| **Arrastrar figura** | Clic izquierdo y arrastrar para mover libremente por el plano |
+| **Rotar B** | Deslizador angular de $-180^\circ$ a $180^\circ$ |
 | **Orbitar cámara (3D)** | Clic derecho o arrastrar fondo |
 | **Zoom cámara (3D)** | Rueda del ratón |
-| **Restablecer escena** | Botón "Restablecer" |
+| **Siguiente eje →** | Recorre los ejes potenciales de colisión |
 
 ---
 
 ## 🛠️ Tecnologías
 
 - **HTML5 Canvas 2D** acelerado por hardware con escalado HiDPI (`devicePixelRatio`).
-- **JavaScript Moderno (ES6+)** con álgebra vectorial pura sin librerías externas.
+- **JavaScript ES6+** con álgebra lineal y cálculo analítico sin librerías externas.
 - **CSS3 Dark Theme** responsivo.

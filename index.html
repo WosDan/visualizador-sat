@@ -2,64 +2,68 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Laboratorio SAT · Separating Axis Theorem (2D & 3D)</title>
+<title>Laboratorio SAT · Separating Axis Theorem (Plano Cartesiano 2D & 3D)</title>
 <style>
 :root{color-scheme:dark;--bg:#1a1a1a;--panel:#222;--edge:#393939;--txt:#f0f1f5;--muted:#a3a7b3;--a:#42b9ff;--b:#ffb15a;--ok:#60d99b;--bad:#ff6e7b;--u:#ffd166;--v:#f4a2ff;--cross:#34d399}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-header{padding:18px 22px;border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
-h1{font-size:21px;margin:0}
-header p{margin:3px 0 0;color:var(--muted)}
-button{border:1px solid #50505a;background:#303039;color:var(--txt);border-radius:9px;padding:9px 13px;cursor:pointer;font:inherit;transition:all .15s ease}
+header{padding:16px 22px;border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+h1{font-size:20px;margin:0}
+header p{margin:3px 0 0;color:var(--muted);font-size:13px}
+button{border:1px solid #50505a;background:#303039;color:var(--txt);border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;transition:all .15s ease}
 button:hover{background:#41414b}
 button.active{background:#224660;border-color:#3baaf2;color:#eaf8ff}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;padding:16px;max-width:1760px;margin:auto}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;padding:16px;max-width:1820px;margin:auto}
 .main,.side section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;overflow:hidden}
-.toolbar{padding:12px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid var(--edge)}
-.status{font-weight:800;letter-spacing:.045em;padding:9px 12px;border-radius:8px}
+.toolbar{padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--edge)}
+.status{font-weight:800;letter-spacing:.045em;padding:8px 11px;border-radius:8px;font-size:13px}
 .status.hit{background:#4c242c;color:#ffb6bd}
 .status.clear{background:#183c30;color:#9ff3c2}
-.canvasWrap{position:relative;min-height:490px;height:min(70vh,780px)}
+.canvasWrap{position:relative;min-height:500px;height:min(72vh,800px)}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 canvas:active{cursor:grabbing}
-.hint{padding:11px 15px;color:var(--muted);font-size:12px;border-top:1px solid var(--edge)}
+.hint{padding:10px 14px;color:var(--muted);font-size:12px;border-top:1px solid var(--edge)}
 .side{display:flex;flex-direction:column;gap:14px;min-width:0}
-.side section{padding:15px}
-h2{font-size:15px;margin:0 0 10px}
+.side section{padding:14px}
+h2{font-size:14px;margin:0 0 8px}
 .sub{font-size:12px;color:var(--muted);margin:0 0 10px}
-.axisList{overflow:auto;max-height:280px;display:flex;flex-direction:column;gap:6px}
-.axis{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.axisList{overflow:auto;max-height:260px;display:flex;flex-direction:column;gap:5px}
+.axis{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px}
 .axis.selected{outline:2px solid #a3cfff;background:#303d4a}
-.axis .left{display:flex;align-items:center;gap:9px}
-.dot{height:10px;width:10px;border-radius:50%;flex-shrink:0}
+.axis .left{display:flex;align-items:center;gap:8px}
+.dot{height:9px;width:9px;border-radius:50%;flex-shrink:0}
 .dot.sep{background:var(--ok)}
 .dot.over{background:var(--bad)}
 .axis small{color:var(--muted);font-size:11px}
-.console{background:#121419;border:1px solid #353942;border-radius:9px;padding:13px;white-space:pre-wrap;overflow:auto;max-height:360px;min-height:240px;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;color:#cbd5e1}
-.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.console{background:#121419;border:1px solid #353942;border-radius:9px;padding:12px;white-space:pre-wrap;overflow:auto;max-height:380px;min-height:260px;font:11.5px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;color:#cbd5e1}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:11.5px}
 .legend span{display:inline-flex;align-items:center}
-.legend span:before{content:'';display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;background:var(--dot-col,var(--a))}
+.legend span:before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--dot-col,var(--a))}
 .legend span:nth-child(1){--dot-col:var(--a)}
 .legend span:nth-child(2){--dot-col:var(--b)}
 .legend span:nth-child(3){--dot-col:var(--ok)}
 .legend span:nth-child(4){--dot-col:var(--bad)}
-.legend-vectors{margin-top:8px;padding-top:8px;border-top:1px solid #30353c}
+.legend-vectors{margin-top:6px;padding-top:6px;border-top:1px solid #30353c}
 .legend-vectors span:nth-child(1){--dot-col:var(--u)}
 .legend-vectors span:nth-child(2){--dot-col:var(--v)}
 .legend-vectors span:nth-child(3){--dot-col:var(--cross)}
-.controlRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.controlRow label{color:var(--muted)}
-input[type=range]{accent-color:#64c8ff;width:125px}
-.note{font-size:12px;color:var(--muted);margin-top:10px}
-@media(max-width:960px){.layout{grid-template-columns:1fr}.canvasWrap{height:55vh;min-height:370px}.axisList{max-height:220px}}
-@media(max-width:500px){header{padding:14px}.layout{padding:9px;gap:9px}.toolbar{padding:9px}.canvasWrap{min-height:340px;height:48vh}h1{font-size:18px}}
+.legend-axes{margin-top:6px;padding-top:6px;border-top:1px solid #30353c}
+.legend-axes span:nth-child(1){--dot-col:#ef4444}
+.legend-axes span:nth-child(2){--dot-col:#22c55e}
+.legend-axes span:nth-child(3){--dot-col:#3b82f6}
+.controlRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.controlRow label{color:var(--muted);font-size:12px}
+input[type=range]{accent-color:#64c8ff;width:110px}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.canvasWrap{height:54vh;min-height:370px}.axisList{max-height:200px}}
+@media(max-width:500px){header{padding:12px}.layout{padding:8px;gap:8px}.toolbar{padding:8px}.canvasWrap{min-height:340px;height:46vh}h1{font-size:17px}}
 </style>
 </head>
 <body>
 <header>
   <div>
-    <h1>Laboratorio SAT <span style="color:#76caff">/ Geometría de colisiones</span></h1>
-    <p>Teorema del Eje Separador · explorador interactivo 2D y 3D</p>
+    <h1>Laboratorio SAT <span style="color:#76caff">/ Plano Cartesiano y Álgebra Vectorial</span></h1>
+    <p>Teorema del Eje Separador · Valores numéricos, producto cruz y proyecciones en tiempo real</p>
   </div>
   <div class="controlRow">
     <button id="mode2" class="active">Modo 2D</button>
@@ -72,8 +76,10 @@ input[type=range]{accent-color:#64c8ff;width:125px}
       <span id="status" class="status clear" role="status" aria-live="polite">OBJETOS SEPARADOS</span>
       <button id="reset">Restablecer</button>
       <button id="next">Siguiente eje →</button>
-      <button id="toggleAxes" class="active" title="Mostrar u ocultar vectores de ejes locales en las figuras">Ejes en figuras: ON</button>
-      <button id="toggleProj" class="active" title="Mostrar u ocultar líneas de proyección ortogonal 3D">Proyecciones 3D: ON</button>
+      <button id="toggleGrid" class="active" title="Mostrar u ocultar cuadrícula graduada como plano cartesiano">Plano cartesiano: ON</button>
+      <button id="toggleCoords" class="active" title="Mostrar u ocultar valores numéricos de vértices y proyecciones">Valores numéricos: ON</button>
+      <button id="toggleAxes" class="active" title="Mostrar u ocultar vectores de ejes locales en las figuras">Ejes figuras: ON</button>
+      <button id="toggleProj" class="active" title="Mostrar u ocultar rayos de proyección 3D">Proyecciones 3D: ON</button>
       <button id="cameraReset" style="display:none">Restablecer cámara</button>
       <div class="controlRow">
         <label for="rotation">Rotar B</label>
@@ -82,22 +88,22 @@ input[type=range]{accent-color:#64c8ff;width:125px}
       </div>
     </div>
     <div class="canvasWrap">
-      <canvas id="canvas" aria-label="Visualización interactiva SAT"></canvas>
+      <canvas id="canvas" aria-label="Visualización interactiva SAT con plano cartesiano"></canvas>
     </div>
-    <div class="hint">Arrastra las figuras para moverlas. Selecciona un eje a la derecha para ver cómo se proyectan los vértices mediante producto punto. En 3D: arrastra el fondo con clic izquierdo/derecho para orbitar la cámara; rueda del ratón para zoom. Los vectores de los ejes muestran las direcciones generadoras y el vector resultante del producto cruz.</div>
+    <div class="hint">La grilla actúa como plano cartesiano con marcas numéricas en X, Y y Z. Cada vértice y vector muestra sus valores exactos para permitirte calcular manualmente el producto cruz y el producto punto paso a paso.</div>
   </main>
   <aside class="side">
     <section>
       <h2>Ejes de prueba <span id="count"></span></h2>
-      <p class="sub">Verde: existe separación. Rojo: solapamiento. Selecciona un eje para ver sus vectores y proyecciones.</p>
+      <p class="sub">Verde: existe separación. Rojo: solapamiento. Selecciona un eje para ver sus vectores y cálculos numéricos.</p>
       <div id="axisList" class="axisList"></div>
     </section>
     <section>
-      <h2>Consola matemática</h2>
+      <h2>Consola matemática paso a paso</h2>
       <pre id="console" class="console"></pre>
     </section>
     <section>
-      <h2>Leyenda y criterio SAT</h2>
+      <h2>Leyenda y plano cartesiano</h2>
       <div class="legend">
         <span>Figura A</span>
         <span>Figura B</span>
@@ -109,17 +115,22 @@ input[type=range]{accent-color:#64c8ff;width:125px}
         <span>Arista v (Fig B)</span>
         <span>Vector n = u × v</span>
       </div>
-      <p class="note">Existe colisión si y solo si <strong>todos</strong> los ejes presentan solapamiento. En 3D se evalúan las normales de cara de cada caja y los 9 productos cruzados entre pares de aristas.</p>
+      <div class="legend legend-axes">
+        <span>Eje Global X</span>
+        <span>Eje Global Y</span>
+        <span>Eje Global Z</span>
+      </div>
+      <p class="note">Todos los valores numéricos de la pantalla corresponden con precisión matemática al origen cartesiano (0, 0, 0). Arrastra cualquier figura para observar cómo cambian los vértices, el producto punto y el producto cruz.</p>
     </section>
   </aside>
 </div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
-const V=(...x)=>x,add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),mul=(a,k)=>a.map(x=>x*k),dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),len=a=>Math.hypot(...a),unit=a=>{const l=len(a);return l>1e-10?mul(a,1/l):null},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],fmt=n=>Number(n).toFixed(4),vec=a=>'['+a.map(fmt).join(', ')+']';
+const V=(...x)=>x,add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),mul=(a,k)=>a.map(x=>x*k),dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),len=a=>Math.hypot(...a),unit=a=>{const l=len(a);return l>1e-10?mul(a,1/l):null},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],fmt=n=>Number(n).toFixed(3),vec=a=>'['+a.map(fmt).join(', ')+']';
 
 let mode=2,selected=0,axes=[],collision=false,drag=null,scale=1,W=1,H=1;
-let showFigureAxes=true,showProjections=true;
+let showCartesianGrid=true,showCoords=true,showFigureAxes=true,showProjections=true;
 const initialCamera={yaw:Math.PI/4,pitch:Math.asin(1/Math.sqrt(3)),zoom:1};
 let camera={...initialCamera};
 const polyA=[[-88,-54],[35,-78],[103,-5],[45,79],[-67,59]];
@@ -268,24 +279,24 @@ function arrow3D(origin3,dir3,len3,color,width=2,headSize=9,badgeLabel='',badgeC
   }
 }
 
-function drawBadge(text,p,color,bg='rgba(15,20,28,0.92)'){
+function drawBadge(text,p,color,bg='rgba(15,20,28,0.92)',fontSize=11){
   ctx.save();
-  ctx.font='bold 11px ui-monospace,SFMono-Regular,Consolas,monospace';
+  ctx.font=`bold ${fontSize}px ui-monospace,SFMono-Regular,Consolas,monospace`;
   let m=ctx.measureText(text);
-  let padX=6,h=18,w=m.width+padX*2;
-  let bx=Math.max(6,Math.min(W-w-6,p[0]));
-  let by=Math.max(16,Math.min(H-h-6,p[1]));
+  let padX=5,h=fontSize+7,w=m.width+padX*2;
+  let bx=Math.max(4,Math.min(W-w-4,p[0]));
+  let by=Math.max(14,Math.min(H-h-4,p[1]));
   ctx.fillStyle=bg;
   ctx.strokeStyle=color;
-  ctx.lineWidth=1.2;
+  ctx.lineWidth=1;
   ctx.beginPath();
-  if(ctx.roundRect) ctx.roundRect(bx,by-h+4,w,h,4); else ctx.rect(bx,by-h+4,w,h);
+  if(ctx.roundRect) ctx.roundRect(bx,by-h+3,w,h,3); else ctx.rect(bx,by-h+3,w,h);
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle=color;
   ctx.textAlign='left';
   ctx.textBaseline='middle';
-  ctx.fillText(text,bx+padX,by-h/2+4);
+  ctx.fillText(text,bx+padX,by-h/2+3);
   ctx.restore();
 }
 
@@ -300,50 +311,183 @@ function polygon(points,fill,stroke){
   ctx.stroke();
 }
 
-function drawGrid(){
-  ctx.fillStyle='#1c2027';
-  ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#30353c';
+function drawCartesian2D(){
+  let orig=screen([0,0]);
+  let ox=orig[0],oy=orig[1];
+  let unitStep=50;
+
+  ctx.save();
+  ctx.strokeStyle='#242b36';
   ctx.lineWidth=1;
-  let step=40*scale;
-  for(let x=(W/2)%step;x<W;x+=step){
-    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+
+  let minX=Math.floor((-ox/scale)/unitStep)*unitStep;
+  let maxX=Math.ceil(((W-ox)/scale)/unitStep)*unitStep;
+  for(let wx=minX;wx<=maxX;wx+=unitStep){
+    let sx=ox+wx*scale;
+    ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke();
   }
-  for(let y=(H*.46)%step;y<H;y+=step){
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+
+  let minY=Math.floor((-oy/scale)/unitStep)*unitStep;
+  let maxY=Math.ceil(((H-oy)/scale)/unitStep)*unitStep;
+  for(let wy=minY;wy<=maxY;wy+=unitStep){
+    let sy=oy+wy*scale;
+    ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();
+  }
+
+  // Ejes cartesianos principales
+  ctx.strokeStyle='#475569';
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke();
+
+  // Flechas en extremos
+  arrow2D([ox,oy],[W-10,oy],'#60a5fa',2.5,9);
+  drawBadge('+X',[W-32,oy-8],'#60a5fa');
+  arrow2D([ox,oy],[10,oy],'#60a5fa77',1.5,7);
+  drawBadge('-X',[18,oy-8],'#60a5fa88');
+
+  arrow2D([ox,oy],[ox,10],'#4ade80',2.5,9);
+  drawBadge('-Y',[ox+8,18],'#4ade80');
+  arrow2D([ox,oy],[ox,H-10],'#4ade80',2.5,9);
+  drawBadge('+Y',[ox+8,H-24],'#4ade80');
+
+  // Marcas numéricas sobre los ejes
+  ctx.font='10px ui-monospace,Consolas,monospace';
+  ctx.fillStyle='#94a3b8';
+  ctx.textAlign='center';
+  ctx.textBaseline='top';
+
+  for(let wx=minX;wx<=maxX;wx+=unitStep){
+    if(wx===0)continue;
+    let sx=ox+wx*scale;
+    ctx.strokeStyle='#64748b';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(sx,oy-4);ctx.lineTo(sx,oy+4);ctx.stroke();
+    ctx.fillText(wx,sx,Math.min(H-18,Math.max(6,oy+6)));
+  }
+
+  ctx.textAlign='right';
+  ctx.textBaseline='middle';
+  for(let wy=minY;wy<=maxY;wy+=unitStep){
+    if(wy===0)continue;
+    let sy=oy+wy*scale;
+    ctx.strokeStyle='#64748b';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(ox-4,sy);ctx.lineTo(ox+4,sy);ctx.stroke();
+    ctx.fillText(wy,Math.min(W-6,Math.max(28,ox-7)),sy);
+  }
+
+  // Origen (0, 0)
+  ctx.fillStyle='#f8fafc';
+  ctx.beginPath();ctx.arc(ox,oy,4,0,Math.PI*2);ctx.fill();
+  drawBadge('(0, 0)',[ox+6,oy+6],'#f8fafc');
+  drawBadge('Plano Cartesiano 2D · Paso = 50 u',[16,16],'#94a3b8','rgba(15,20,30,0.85)');
+  ctx.restore();
+}
+
+function drawCartesian3D(){
+  ctx.save();
+  // Grilla en el plano del suelo Y = 0 (de -4 a 4 en X y Z)
+  for(let x=-4;x<=4;x+=1){
+    let p1=projectScreen([x,0,-4]),p2=projectScreen([x,0,4]);
+    line(p1,p2,'#242c38',1);
+  }
+  for(let z=-4;z<=4;z+=1){
+    let p1=projectScreen([-4,0,z]),p2=projectScreen([4,0,z]);
+    line(p1,p2,'#242c38',1);
+  }
+
+  // Ejes globales 3D desde el origen (0, 0, 0)
+  // Eje X (Rojo)
+  arrow3D([0,0,0],[1,0,0],4.4,'#ef4444',2.5,9,'+X','#ef4444');
+  arrow3D([0,0,0],[-1,0,0],4.4,'#ef444455',1.5,7,'-X','#ef444477');
+  // Eje Z (Azul)
+  arrow3D([0,0,0],[0,0,1],4.4,'#3b82f6',2.5,9,'+Z','#3b82f6');
+  arrow3D([0,0,0],[0,0,-1],4.4,'#3b82f655',1.5,7,'-Z','#3b82f677');
+  // Eje Y (Verde - vertical)
+  arrow3D([0,0,0],[0,1,0],3.2,'#22c55e',2.5,9,'+Y','#22c55e');
+  arrow3D([0,0,0],[0,-1,0],3.2,'#22c55e55',1.5,7,'-Y','#22c55e77');
+
+  // Graduaciones numéricas en los ejes X, Y, Z
+  for(let val of [-3,-2,-1,1,2,3]){
+    let ptX=projectScreen([val,0,0]);
+    drawBadge(val.toString(),[ptX[0]+3,ptX[1]+3],'#ef4444','rgba(15,20,30,0.85)',9);
+    let ptZ=projectScreen([0,0,val]);
+    drawBadge(val.toString(),[ptZ[0]+3,ptZ[1]+3],'#3b82f6','rgba(15,20,30,0.85)',9);
+    let ptY=projectScreen([0,val,0]);
+    drawBadge(val.toString(),[ptY[0]+3,ptY[1]+3],'#22c55e','rgba(15,20,30,0.85)',9);
+  }
+
+  // Origen (0, 0, 0)
+  let pOrig=projectScreen([0,0,0]);
+  ctx.fillStyle='#f8fafc';
+  ctx.beginPath();ctx.arc(pOrig[0],pOrig[1],4,0,Math.PI*2);ctx.fill();
+  drawBadge('O (0, 0, 0)',[pOrig[0]+6,pOrig[1]+6],'#f8fafc');
+  drawBadge('Espacio Cartesiano 3D · Paso = 1.0 u · Ejes [X, Y, Z]',[16,16],'#94a3b8','rgba(15,20,30,0.85)');
+  ctx.restore();
+}
+
+function drawGrid(){
+  ctx.fillStyle='#171a21';
+  ctx.fillRect(0,0,W,H);
+  if(showCartesianGrid){
+    if(mode===2){
+      drawCartesian2D();
+    }else{
+      drawCartesian3D();
+    }
+  }else{
+    ctx.strokeStyle='#242b36';
+    ctx.lineWidth=1;
+    let step=40*scale;
+    for(let x=(W/2)%step;x<W;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+    for(let y=(H*.46)%step;y<H;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
   }
 }
 
 function drawPoly(v,fill,stroke,label,obj){
   let pts=v.map(projectScreen);
   polygon(pts,fill,stroke);
-  let c=pts.reduce((a,p)=>add(a,p),[0,0]).map(x=>x/pts.length);
-  ctx.fillStyle='#fff';
-  ctx.font='bold 15px system-ui';
-  ctx.textAlign='center';
-  ctx.fillText(label,...c);
+  let cWorld=v.reduce((a,p)=>add(a,p),[0,0]).map(x=>x/v.length);
+  let cScreen=projectScreen(cWorld);
+
+  if(showCoords){
+    drawBadge(`${label} (${Math.round(cWorld[0])}, ${Math.round(cWorld[1])})`,[cScreen[0]-25,cScreen[1]-10],'#ffffff','rgba(15,23,42,0.92)',11);
+    v.forEach((p,i)=>{
+      let ps=projectScreen(p);
+      ctx.fillStyle=label==='A'?'#42b9ff':'#ffb15a';
+      ctx.beginPath();ctx.arc(ps[0],ps[1],3.5,0,Math.PI*2);ctx.fill();
+      let coordTxt=`P${i+1}(${Math.round(p[0])}, ${Math.round(p[1])})`;
+      drawBadge(coordTxt,[ps[0]+5,ps[1]-5],label==='A'?'#42b9ff':'#ffb15a','rgba(15,20,30,0.9)',9.5);
+    });
+  }else{
+    ctx.fillStyle='#fff';
+    ctx.font='bold 15px system-ui';
+    ctx.textAlign='center';
+    ctx.fillText(label,cScreen[0],cScreen[1]+5);
+  }
 
   if(showFigureAxes){
-    let cWorld=v.reduce((a,p)=>add(a,p),[0,0]).map(x=>x/v.length);
     let u1=[Math.cos(obj.angle),Math.sin(obj.angle)];
     let u2=[-Math.sin(obj.angle),Math.cos(obj.angle)];
-    let pC=projectScreen(cWorld);
     let pU1=projectScreen(add(cWorld,mul(u1,45)));
     let pU2=projectScreen(add(cWorld,mul(u2,45)));
-    arrow2D(pC,pU1,label==='A'?'#76caff':'#fbbf24',2,7);
-    arrow2D(pC,pU2,label==='A'?'#38bdf8':'#f59e0b',2,7);
+    arrow2D(cScreen,pU1,label==='A'?'#76caff':'#fbbf24',2,7);
+    arrow2D(cScreen,pU2,label==='A'?'#38bdf8':'#f59e0b',2,7);
 
-    // Pequeñas normales hacia el exterior en cada arista
     v.forEach((p,i)=>{
       let q=v[(i+1)%v.length];
       let edge=sub(q,p);
       let norm=unit([-edge[1],edge[0]]);
       let mid=mul(add(p,q),0.5);
       let pMid=projectScreen(mid);
-      let pNorm=projectScreen(add(mid,mul(norm,22)));
+      let pNorm=projectScreen(add(mid,mul(norm,24)));
       let isActive=axes[selected]&&axes[selected].origin&&axes[selected].origin.type==='edge'&&axes[selected].origin.label===label&&axes[selected].origin.i===i;
       if(isActive){
         arrow2D(pMid,pNorm,'#ffe066',3.5,10);
+        if(showCoords){
+          drawBadge(`n=(${fmt(norm[0])}, ${fmt(norm[1])})`,[pNorm[0]+6,pNorm[1]-6],'#ffe066','rgba(15,20,30,0.9)',9.5);
+        }
       }else{
         arrow2D(pMid,pNorm,'rgba(255,255,255,0.3)',1.2,5);
       }
@@ -358,10 +502,22 @@ function drawBox(o,color,label){
     polygon(f.ids.map(i=>projectScreen(v[i])),color==='a'?'rgba(66,185,255,.22)':'rgba(255,177,90,.22)',color==='a'?'#42b9ff':'#ffb15a');
   }
   let p=projectScreen(o.pos);
-  ctx.fillStyle='#fff';
-  ctx.font='bold 16px system-ui';
-  ctx.textAlign='center';
-  ctx.fillText(label,p[0],p[1]+5);
+
+  if(showCoords){
+    drawBadge(`${label} [${o.pos.map(x=>Number(x).toFixed(2)).join(', ')}]`,[p[0]-35,p[1]-10],'#ffffff','rgba(15,23,42,0.92)',11);
+    v.forEach((vert,idx)=>{
+      let ps=projectScreen(vert);
+      ctx.fillStyle=color==='a'?'#42b9ff':'#ffb15a';
+      ctx.beginPath();ctx.arc(ps[0],ps[1],3.5,0,Math.PI*2);ctx.fill();
+      let vTxt=`v${idx+1}[${vert.map(x=>Number(x).toFixed(1)).join(',')}]`;
+      drawBadge(vTxt,[ps[0]+5,ps[1]-5],color==='a'?'#42b9ff':'#ffb15a','rgba(15,20,30,0.88)',9);
+    });
+  }else{
+    ctx.fillStyle='#fff';
+    ctx.font='bold 16px system-ui';
+    ctx.textAlign='center';
+    ctx.fillText(label,p[0],p[1]+5);
+  }
 
   if(showFigureAxes){
     drawFigureAxes3D(o,label,color==='a');
@@ -383,7 +539,8 @@ function drawFigureAxes3D(o,label,isA){
     let col=active?'#ffd166':axisColors[i];
     let strokeW=active?3.5:2;
     let head=active?11:8;
-    arrow3D(center,b[i],lenAxis,col,strokeW,head,`${label}.${axisNames[i]}${active?' ★':''}`,col);
+    let coordStr=showCoords?` [${b[i].map(x=>Number(x).toFixed(2)).join(',')}]`:'';
+    arrow3D(center,b[i],lenAxis,col,strokeW,head,`${label}.${axisNames[i]}${coordStr}${active?' ★':''}`,col);
   }
 }
 
@@ -403,9 +560,7 @@ function drawAxis(axis,va,vb){
       let u=mul(d,1/L);
       line(sub(s,mul(u,3000)),add(s,mul(u,3000)),'#d9e5ff55',2,[8,7]);
     }
-
     if(showProjections){
-      // Proyección ortogonal 3D mediante producto punto de los vértices sobre el eje
       drawProjections3D(axis,center,va,vb);
     }
     drawIntervals3(axis,va,vb);
@@ -414,35 +569,36 @@ function drawAxis(axis,va,vb){
 
 function drawProjections3D(axis,center,va,vb){
   let n=axis.n;
-  // Cada vértice v_k se proyecta ortogonalmente sobre la recta que pasa por center: Q = center + ((v - center) · n) * n
-  let projA=va.map(v=>{
+  let projA=va.map((v,idx)=>{
     let t=dot(sub(v,center),n);
-    return {v,q:add(center,mul(n,t))};
+    let scalar=dot(v,n);
+    return {v,idx:idx+1,scalar,q:add(center,mul(n,t))};
   });
-  let projB=vb.map(v=>{
+  let projB=vb.map((v,idx)=>{
     let t=dot(sub(v,center),n);
-    return {v,q:add(center,mul(n,t))};
+    let scalar=dot(v,n);
+    return {v,idx:idx+1,scalar,q:add(center,mul(n,t))};
   });
 
-  // Rayos de proyección punteados desde vértices 3D hasta el eje
   projA.forEach(item=>{
     let pv=projectScreen(item.v),pq=projectScreen(item.q);
     line(pv,pq,'rgba(66,185,255,0.28)',1,[3,4]);
     ctx.fillStyle='#42b9ff';
-    ctx.beginPath();
-    ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);
-    ctx.fill();
+    ctx.beginPath();ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);ctx.fill();
+    if(showCoords&&(Math.abs(item.scalar-axis.a.min)<1e-4||Math.abs(item.scalar-axis.a.max)<1e-4)){
+      drawBadge(`p${item.idx}=${fmt(item.scalar)}`,[pq[0]+4,pq[1]-4],'#42b9ff','rgba(10,15,25,0.85)',9);
+    }
   });
   projB.forEach(item=>{
     let pv=projectScreen(item.v),pq=projectScreen(item.q);
     line(pv,pq,'rgba(255,177,90,0.28)',1,[3,4]);
     ctx.fillStyle='#ffb15a';
-    ctx.beginPath();
-    ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);
-    ctx.fill();
+    ctx.beginPath();ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);ctx.fill();
+    if(showCoords&&(Math.abs(item.scalar-axis.b.min)<1e-4||Math.abs(item.scalar-axis.b.max)<1e-4)){
+      drawBadge(`p${item.idx}=${fmt(item.scalar)}`,[pq[0]+4,pq[1]-4],'#ffb15a','rgba(10,15,25,0.85)',9);
+    }
   });
 
-  // Intervalos de sombra proyectada dibujados directamente en 3D sobre el eje
   let cDotN=dot(center,n);
   let pA1=projectScreen(add(center,mul(n,axis.a.min-cDotN)));
   let pA2=projectScreen(add(center,mul(n,axis.a.max-cDotN)));
@@ -450,6 +606,13 @@ function drawProjections3D(axis,center,va,vb){
   let pB2=projectScreen(add(center,mul(n,axis.b.max-cDotN)));
   line(pA1,pA2,'#42b9ff',7);
   line(pB1,pB2,'#ffb15a',7);
+
+  if(showCoords){
+    drawBadge(`MinA=${fmt(axis.a.min)}`,[pA1[0],pA1[1]-14],'#42b9ff','rgba(10,15,25,0.85)',9.5);
+    drawBadge(`MaxA=${fmt(axis.a.max)}`,[pA2[0],pA2[1]+14],'#42b9ff','rgba(10,15,25,0.85)',9.5);
+    drawBadge(`MinB=${fmt(axis.b.min)}`,[pB1[0],pB1[1]-14],'#ffb15a','rgba(10,15,25,0.85)',9.5);
+    drawBadge(`MaxB=${fmt(axis.b.max)}`,[pB2[0],pB2[1]+14],'#ffb15a','rgba(10,15,25,0.85)',9.5);
+  }
 }
 
 function drawIntervals(axis,origin,u,factor,va,vb){
@@ -465,8 +628,22 @@ function drawIntervals(axis,origin,u,factor,va,vb){
     ctx.arc(...x,5,0,Math.PI*2);
     ctx.fill();
   }
-  for(let v of va)line(projectScreen(v),point(dot(v,axis.n),-12),'#42b9ff44',1,[3,5]);
-  for(let v of vb)line(projectScreen(v),point(dot(v,axis.n),12),'#ffb15a44',1,[3,5]);
+  for(let v of va){
+    let pt=point(dot(v,axis.n),-12);
+    line(projectScreen(v),pt,'#42b9ff44',1,[3,5]);
+  }
+  for(let v of vb){
+    let pt=point(dot(v,axis.n),12);
+    line(projectScreen(v),pt,'#ffb15a44',1,[3,5]);
+  }
+  if(showCoords){
+    let pMinA=point(a.min,-24),pMaxA=point(a.max,-24);
+    let pMinB=point(b.min,24),pMaxB=point(b.max,24);
+    drawBadge(`MinA=${fmt(a.min)}`,pMinA,'#42b9ff','rgba(15,20,30,0.9)',9.5);
+    drawBadge(`MaxA=${fmt(a.max)}`,pMaxA,'#42b9ff','rgba(15,20,30,0.9)',9.5);
+    drawBadge(`MinB=${fmt(b.min)}`,pMinB,'#ffb15a','rgba(15,20,30,0.9)',9.5);
+    drawBadge(`MaxB=${fmt(b.max)}`,pMaxB,'#ffb15a','rgba(15,20,30,0.9)',9.5);
+  }
   return point;
 }
 
@@ -503,35 +680,31 @@ function drawOrigin(axis){
     line(a,b,'#ffe066',6);
     line(mid,end,'#34d399',3);
     ctx.fillStyle='#ffe066';
-    ctx.beginPath();
-    ctx.arc(...a,5,0,Math.PI*2);
-    ctx.arc(...b,5,0,Math.PI*2);
-    ctx.fill();
+    ctx.beginPath();ctx.arc(...a,5,0,Math.PI*2);ctx.arc(...b,5,0,Math.PI*2);ctx.fill();
     arrow2D(mid,end,'#34d399',3.5,10);
-    drawBadge(`${o.label}: arista ${o.i+1} → normal unitario n`,[end[0]+8,end[1]-8],'#34d399');
+    let badgeText=showCoords?`${o.label}: arista ${o.i+1} → normal n=${vec(axis.n)}`:`${o.label}: arista ${o.i+1} → normal unitario n`;
+    drawBadge(badgeText,[end[0]+8,end[1]-8],'#34d399');
   }else{
     let ca=state.a3.pos,cb=state.b3.pos;
     let mid=mul(add(ca,cb),0.5);
 
     if(o.type==='face'){
-      // Normal de cara destacada
       let originPt=o.label==='A'?ca:cb;
       let lenFace=o.label==='A'?state.a3.half[o.i]+1.2:state.b3.half[o.i]+1.2;
-      arrow3D(originPt,o.u,lenFace,'#ffd166',4,12,`${o.label}.${'XYZ'[o.i]} (normal de cara)`,'#ffd166');
+      let txt=showCoords?`${o.label}.${'XYZ'[o.i]} n=${vec(axis.n)}`:`${o.label}.${'XYZ'[o.i]} (normal de cara)`;
+      arrow3D(originPt,o.u,lenFace,'#ffd166',4,12,txt,'#ffd166');
     }else if(o.type==='cross'){
-      // PRODUCTO CRUZ Y VECTOR RESULTANTE
-      // 1. Vectores directores de aristas en cada figura
-      arrow3D(ca,o.u,state.a3.half[o.i]+1.1,'#ffd166',3.5,11,`u = A.${'XYZ'[o.i]}`,'#ffd166');
-      arrow3D(cb,o.v,state.b3.half[o.j]+1.1,'#f4a2ff',3.5,11,`v = B.${'XYZ'[o.j]}`,'#f4a2ff');
+      let txtU=showCoords?`u=A.${'XYZ'[o.i]} ${vec(o.u)}`:`u = A.${'XYZ'[o.i]}`;
+      let txtV=showCoords?`v=B.${'XYZ'[o.j]} ${vec(o.v)}`:`v = B.${'XYZ'[o.j]}`;
+      arrow3D(ca,o.u,state.a3.half[o.i]+1.1,'#ffd166',3.5,11,txtU,'#ffd166');
+      arrow3D(cb,o.v,state.b3.half[o.j]+1.1,'#f4a2ff',3.5,11,txtV,'#f4a2ff');
 
-      // 2. Construcción matemática del producto cruz en el punto medio entre figuras
       let scaleU=1.4,scaleV=1.4;
       let pMid=projectScreen(mid);
       let pU=projectScreen(add(mid,mul(o.u,scaleU)));
       let pV=projectScreen(add(mid,mul(o.v,scaleV)));
       let pUV=projectScreen(add(mid,add(mul(o.u,scaleU),mul(o.v,scaleV))));
 
-      // Plano sombreado formado por u y v
       ctx.save();
       ctx.fillStyle='rgba(255, 209, 102, 0.12)';
       ctx.strokeStyle='rgba(255, 209, 102, 0.35)';
@@ -547,19 +720,17 @@ function drawOrigin(axis){
       ctx.stroke();
       ctx.restore();
 
-      // Vectores u y v llevados al origen común en el centro
       arrow2D(pMid,pU,'#ffd166',2.5,9);
       drawBadge(`u (arista A)`,[pU[0]+5,pU[1]-5],'#ffd166');
       arrow2D(pMid,pV,'#f4a2ff',2.5,9);
       drawBadge(`v (arista B)`,[pV[0]+5,pV[1]-5],'#f4a2ff');
 
-      // 3. VECTOR RESULTANTE DEL PRODUCTO CRUZ (n = (u × v) / ||u × v||)
       let crossLen=2.1;
       let pCross=projectScreen(add(mid,mul(axis.n,crossLen)));
       arrow2D(pMid,pCross,'#34d399',4.2,13);
-      drawBadge(`Vector Resultante: n = u × v`,[pCross[0]+8,pCross[1]-8],'#34d399','rgba(10,36,25,0.95)');
+      let nTxt=showCoords?`Vector n = u × v = ${vec(axis.n)}`:`Vector Resultante: n = u × v`;
+      drawBadge(nTxt,[pCross[0]+8,pCross[1]-8],'#34d399','rgba(10,36,25,0.95)');
 
-      // Símbolo de perpendicularidad (ángulo recto)
       let sP=0.22;
       let pCornerU=projectScreen(add(add(mid,mul(axis.n,sP)),mul(o.u,sP)));
       let pEdgeN=projectScreen(add(mid,mul(axis.n,sP)));
@@ -571,13 +742,24 @@ function drawOrigin(axis){
   ctx.restore();
 }
 
-function originText(o,axis){
+function originText(o,axis,va,vb){
   if(!o)return '';
-  if(o.type==='edge')return `ORIGEN GEOMÉTRICO (2D)\nFigura ${o.label}, arista ${o.i+1}\nP = ${vec(o.p)}\nQ = ${vec(o.q)}\nVector arista e = Q - P = ${vec(o.edge)}\nNormal perpendicular = (-e.y, e.x) = ${vec([-o.edge[1],o.edge[0]])}\nNormalizar: n = normal / ||normal||\nVector unitario del eje: n = ${vec(axis.n)}\n\nPROYECCIÓN POR PRODUCTO PUNTO:\nCada vértice v se proyecta sobre el eje calculando:\n  p = v · n = (v_x * n_x + v_y * n_y)`;
-  if(o.type==='face')return `ORIGEN GEOMÉTRICO (3D - NORMAL DE CARA)\nCaja ${o.label}, vector eje local ${'XYZ'[o.i]}\nDirección local rotada u = ${vec(o.u)}\nEn una OBB, este vector es perpendicular a un par de caras paralelas.\nVector unitario del eje: n = u = ${vec(axis.n)}\n\nPROYECCIÓN POR PRODUCTO PUNTO:\nCada vértice 3D se proyecta calculando el producto escalar:\n  p = v · n = (v_x * n_x + v_y * n_y + v_z * n_z)`;
+  if(o.type==='edge'){
+    let dotCalcsA=va.map((v,i)=>`  v${i+1}(${Math.round(v[0])}, ${Math.round(v[1])}) · n = (${fmt(v[0])}*${fmt(axis.n[0])}) + (${fmt(v[1])}*${fmt(axis.n[1])}) = ${fmt(dot(v,axis.n))}`).join('\n');
+    let dotCalcsB=vb.map((v,i)=>`  v${i+1}(${Math.round(v[0])}, ${Math.round(v[1])}) · n = (${fmt(v[0])}*${fmt(axis.n[0])}) + (${fmt(v[1])}*${fmt(axis.n[1])}) = ${fmt(dot(v,axis.n))}`).join('\n');
+    return `ORIGEN GEOMÉTRICO (2D · PLANO CARTESIANO)\nFigura ${o.label}, arista ${o.i+1}\nPunto inicial P = (${fmt(o.p[0])}, ${fmt(o.p[1])})\nPunto final   Q = (${fmt(o.q[0])}, ${fmt(o.q[1])})\nVector arista e = Q - P = (${fmt(o.edge[0])}, ${fmt(o.edge[1])})\nNormal perpendicular (-e.y, e.x) = (${fmt(-o.edge[1])}, ${fmt(o.edge[0])})\nMagnitud ||normal|| = ${fmt(Math.hypot(o.edge[0],o.edge[1]))}\nVector unitario n = normal / ||normal|| = ${vec(axis.n)}\n\nCÁLCULO DEL PRODUCTO PUNTO PASO A PASO (p = v · n):\nProyecciones Figura A:\n${dotCalcsA}\n\nProyecciones Figura B:\n${dotCalcsB}`;
+  }
+  if(o.type==='face'){
+    let dotCalcsA=va.map((v,i)=>`  v${i+1}[${v.map(fmt).join(', ')}] · n = ${fmt(dot(v,axis.n))}`).join('\n');
+    let dotCalcsB=vb.map((v,i)=>`  v${i+1}[${v.map(fmt).join(', ')}] · n = ${fmt(dot(v,axis.n))}`).join('\n');
+    return `ORIGEN GEOMÉTRICO (3D · NORMAL DE CARA)\nCaja ${o.label}, vector eje local ${'XYZ'[o.i]}\nVector unitario del eje n = ${vec(axis.n)}\nEn una OBB, este vector es perpendicular a un par de caras paralelas.\n\nCÁLCULO DEL PRODUCTO PUNTO (p = v · n):\nProyecciones Caja A:\n${dotCalcsA}\n\nProyecciones Caja B:\n${dotCalcsB}`;
+  }
   let c=cross(o.u,o.v);
   let magC=len(c);
-  return `ORIGEN GEOMÉTRICO (3D - PRODUCTO CRUZ)\n${'─'.repeat(40)}\n1. VECTORES GENERADORES DE ARISTAS:\n   Arista Caja A (u) = ${vec(o.u)}  [Eje local A.${'XYZ'[o.i]}]\n   Arista Caja B (v) = ${vec(o.v)}  [Eje local B.${'XYZ'[o.j]}]\n\n2. PRODUCTO CRUZ (Cross Product):\n   C = u × v = [ u_y*v_z - u_z*v_y,\n                 u_z*v_x - u_x*v_z,\n                 u_x*v_y - u_y*v_x ]\n   C = ${vec(c)}\n   Magnitud ||C|| = ${fmt(magC)}\n\n3. VECTOR RESULTANTE NORMALIZADO (Eje SAT):\n   n = C / ||C|| = ${vec(axis.n)}\n   Propiedad: n es ortogonal a ambos vectores (n ⊥ u y n ⊥ v).\n\n4. PROYECCIÓN MEDIANTE PRODUCTO PUNTO (Dot Product):\n   Para cada vértice 3D v_k de las cajas A y B:\n   p_k = v_k · n = (v_x * n_x + v_y * n_y + v_z * n_z)\n   El producto punto mapea cada vértice tridimensional a un escalar sobre n,\n   definiendo los intervalos [MinA, MaxA] y [MinB, MaxB].`;
+  let dotCalcsA=va.map((v,i)=>`  v${i+1}[${v.map(x=>Number(x).toFixed(2)).join(',')}] · n = (${fmt(v[0])}*${fmt(axis.n[0])})+(${fmt(v[1])}*${fmt(axis.n[1])})+(${fmt(v[2])}*${fmt(axis.n[2])}) = ${fmt(dot(v,axis.n))}`).join('\n');
+  let dotCalcsB=vb.map((v,i)=>`  v${i+1}[${v.map(x=>Number(x).toFixed(2)).join(',')}] · n = (${fmt(v[0])}*${fmt(axis.n[0])})+(${fmt(v[1])}*${fmt(axis.n[1])})+(${fmt(v[2])}*${fmt(axis.n[2])}) = ${fmt(dot(v,axis.n))}`).join('\n');
+
+  return `ORIGEN GEOMÉTRICO (3D · PRODUCTO CRUZ)\n${'─'.repeat(42)}\n1. VECTORES GENERADORES DE ARISTAS (CARTESIANO):\n   Arista Caja A (u) = ${vec(o.u)}  [Eje local A.${'XYZ'[o.i]}]\n   Arista Caja B (v) = ${vec(o.v)}  [Eje local B.${'XYZ'[o.j]}]\n\n2. PRODUCTO CRUZ (Cross Product):\n   Cx = (uy * vz) - (uz * vy) = (${fmt(o.u[1])}*${fmt(o.v[2])}) - (${fmt(o.u[2])}*${fmt(o.v[1])}) = ${fmt(c[0])}\n   Cy = (uz * vx) - (ux * vz) = (${fmt(o.u[2])}*${fmt(o.v[0])}) - (${fmt(o.u[0])}*${fmt(o.v[2])}) = ${fmt(c[1])}\n   Cz = (ux * vy) - (uy * vx) = (${fmt(o.u[0])}*${fmt(o.v[1])}) - (${fmt(o.u[1])}*${fmt(o.v[0])}) = ${fmt(c[2])}\n   Vector C = u × v = ${vec(c)}\n   Magnitud ||C|| = sqrt(Cx² + Cy² + Cz²) = ${fmt(magC)}\n\n3. VECTOR UNITARIO RESULTANTE (Eje de proyección SAT):\n   n = C / ||C|| = ${vec(axis.n)}\n   Propiedad: n ⊥ u y n ⊥ v.\n\n4. CÁLCULO DEL PRODUCTO PUNTO PARA CADA VÉRTICE (p = v · n):\nProyecciones Caja A:\n${dotCalcsA}\n\nProyecciones Caja B:\n${dotCalcsB}`;
 }
 
 function render(va,vb){
@@ -597,7 +779,7 @@ function render(va,vb){
   ctx.fillStyle='#aeb9c7';
   ctx.font='12px system-ui';
   ctx.textAlign='left';
-  ctx.fillText(mode===2?'SAT 2D · normales de aristas':'SAT 3D · 6 normales de cara + 9 productos cruzados',18,25);
+  ctx.fillText(mode===2?'SAT 2D · Plano Cartesiano y Normales de arista':'SAT 3D · Espacio Cartesiano 3D y 15 Ejes potenciales',18,25);
   ctx.fillStyle=collision?'#ff7f8b':'#73e4aa';
   ctx.fillText(collision?'TODOS LOS EJES SE SOLAPAN (COLISIÓN)':'EXISTE AL MENOS UN EJE SEPARADOR (SIN CHOQUE)',18,44);
 }
@@ -619,7 +801,9 @@ function update(){
   let a=axes[selected];
   if(a){
     let sep1=a.a.max<a.b.min-1e-8,sep2=a.b.max<a.a.min-1e-8;
-    $('console').textContent=`MODO ${mode}D · EJE #${selected+1}: ${a.name}\n${'─'.repeat(40)}\n${originText(a.origin,a)}\n\nNormal unitario n = ${vec(a.n)}\n\nProducto punto: p = vértice · n\nProyecciones A:\n  ${a.a.vals.map(fmt).join(', ')}\nProyecciones B:\n  ${a.b.vals.map(fmt).join(', ')}\n\nMinA = ${fmt(a.a.min)}\nMaxA = ${fmt(a.a.max)}\nMinB = ${fmt(a.b.min)}\nMaxB = ${fmt(a.b.max)}\n\nCondición de separación:\n  (MaxA < MinB) || (MaxB < MinA)\n  (${fmt(a.a.max)} < ${fmt(a.b.min)}) || (${fmt(a.b.max)} < ${fmt(a.a.min)})\n  ${sep1} || ${sep2} = ${a.sep}\n\nResultado del eje: ${a.sep?'SEPARACIÓN ✓':'SOLAPAMIENTO ✕'}\nResultado global: ${collision?'COLISIÓN':'OBJETOS SEPARADOS'}`;
+    let distSep=a.sep?(a.a.max<a.b.min?a.b.min-a.a.max:a.a.min-a.b.max):0;
+    let distOver=!a.sep?Math.min(a.a.max,a.b.max)-Math.max(a.a.min,a.b.min):0;
+    $('console').textContent=`MODO ${mode}D · EJE #${selected+1}: ${a.name}\n${'─'.repeat(42)}\n${originText(a.origin,a,va,vb)}\n\nNormal unitario n = ${vec(a.n)}\n\nINTERVALOS RESULTANTES EN LA RECTA n:\n  MinA = ${fmt(a.a.min)}\n  MaxA = ${fmt(a.a.max)}  →  Intervalo A: [${fmt(a.a.min)}, ${fmt(a.a.max)}]\n  MinB = ${fmt(a.b.min)}\n  MaxB = ${fmt(a.b.max)}  →  Intervalo B: [${fmt(a.b.min)}, ${fmt(a.b.max)}]\n\nEVALUACIÓN DE SEPARACIÓN:\n  (MaxA < MinB) || (MaxB < MinA)\n  (${fmt(a.a.max)} < ${fmt(a.b.min)}) || (${fmt(a.b.max)} < ${fmt(a.a.min)})\n  ${sep1} || ${sep2} = ${a.sep}\n\nDistancia de ${a.sep?'separación gap':'solapamiento'}: ${fmt(a.sep?distSep:distOver)} u\nResultado del eje: ${a.sep?'SEPARACIÓN ✓ (Eje separador encontrado)':'SOLAPAMIENTO ✕'}\nResultado global: ${collision?'COLISIÓN DETECTADA':'OBJETOS SEPARADOS'}`;
   }
   render(va,vb);
 }
@@ -727,10 +911,22 @@ function setMode(n){
 $('reset').onclick=reset;
 $('cameraReset').onclick=()=>{camera={...initialCamera};update()};
 $('next').onclick=()=>{selected=(selected+1)%axes.length;update()};
+$('toggleGrid').onclick=()=>{
+  showCartesianGrid=!showCartesianGrid;
+  $('toggleGrid').classList.toggle('active',showCartesianGrid);
+  $('toggleGrid').textContent=`Plano cartesiano: ${showCartesianGrid?'ON':'OFF'}`;
+  update();
+};
+$('toggleCoords').onclick=()=>{
+  showCoords=!showCoords;
+  $('toggleCoords').classList.toggle('active',showCoords);
+  $('toggleCoords').textContent=`Valores numéricos: ${showCoords?'ON':'OFF'}`;
+  update();
+};
 $('toggleAxes').onclick=()=>{
   showFigureAxes=!showFigureAxes;
   $('toggleAxes').classList.toggle('active',showFigureAxes);
-  $('toggleAxes').textContent=`Ejes en figuras: ${showFigureAxes?'ON':'OFF'}`;
+  $('toggleAxes').textContent=`Ejes figuras: ${showFigureAxes?'ON':'OFF'}`;
   update();
 };
 $('toggleProj').onclick=()=>{
