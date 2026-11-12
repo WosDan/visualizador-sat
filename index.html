@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Laboratorio SAT · Separating Axis Theorem (Plano Cartesiano 2D & 3D)</title>
+<title>Laboratorio SAT · Separating Axis Theorem (Valores Específicos del Eje)</title>
 <style>
 :root{color-scheme:dark;--bg:#1a1a1a;--panel:#222;--edge:#393939;--txt:#f0f1f5;--muted:#a3a7b3;--a:#42b9ff;--b:#ffb15a;--ok:#60d99b;--bad:#ff6e7b;--u:#ffd166;--v:#f4a2ff;--cross:#34d399}
 *{box-sizing:border-box}
@@ -63,7 +63,7 @@ input[type=range]{accent-color:#64c8ff;width:110px}
 <header>
   <div>
     <h1>Laboratorio SAT <span style="color:#76caff">/ Plano Cartesiano y Álgebra Vectorial</span></h1>
-    <p>Teorema del Eje Separador · Valores numéricos, producto cruz y proyecciones en tiempo real</p>
+    <p>Teorema del Eje Separador · Valores estrictos del cálculo activo, producto cruz y proyecciones</p>
   </div>
   <div class="controlRow">
     <button id="mode2" class="active">Modo 2D</button>
@@ -77,7 +77,7 @@ input[type=range]{accent-color:#64c8ff;width:110px}
       <button id="reset">Restablecer</button>
       <button id="next">Siguiente eje →</button>
       <button id="toggleGrid" class="active" title="Mostrar u ocultar cuadrícula graduada como plano cartesiano">Plano cartesiano: ON</button>
-      <button id="toggleCoords" class="active" title="Mostrar u ocultar valores numéricos de vértices y proyecciones">Valores numéricos: ON</button>
+      <button id="toggleCoords" class="active" title="Mostrar u ocultar exclusivamente los valores usados en el cálculo del eje activo">Valores del cálculo: ON</button>
       <button id="toggleAxes" class="active" title="Mostrar u ocultar vectores de ejes locales en las figuras">Ejes figuras: ON</button>
       <button id="toggleProj" class="active" title="Mostrar u ocultar rayos de proyección 3D">Proyecciones 3D: ON</button>
       <button id="cameraReset" style="display:none">Restablecer cámara</button>
@@ -90,16 +90,16 @@ input[type=range]{accent-color:#64c8ff;width:110px}
     <div class="canvasWrap">
       <canvas id="canvas" aria-label="Visualización interactiva SAT con plano cartesiano"></canvas>
     </div>
-    <div class="hint">La grilla actúa como plano cartesiano con marcas numéricas en X, Y y Z. Cada vértice y vector muestra sus valores exactos para permitirte calcular manualmente el producto cruz y el producto punto paso a paso.</div>
+    <div class="hint">La escena muestra <strong>únicamente los valores matemáticos que se utilizan</strong> para el eje activo: los vectores generadores (aristas o producto cruz) y los vértices que determinan los extremos de proyección [Min, Max] de cada figura.</div>
   </main>
   <aside class="side">
     <section>
       <h2>Ejes de prueba <span id="count"></span></h2>
-      <p class="sub">Verde: existe separación. Rojo: solapamiento. Selecciona un eje para ver sus vectores y cálculos numéricos.</p>
+      <p class="sub">Verde: existe separación. Rojo: solapamiento. Selecciona un eje para ver exclusivamente sus valores.</p>
       <div id="axisList" class="axisList"></div>
     </section>
     <section>
-      <h2>Consola matemática paso a paso</h2>
+      <h2>Cálculo aritmético del eje activo</h2>
       <pre id="console" class="console"></pre>
     </section>
     <section>
@@ -120,7 +120,7 @@ input[type=range]{accent-color:#64c8ff;width:110px}
         <span>Eje Global Y</span>
         <span>Eje Global Z</span>
       </div>
-      <p class="note">Todos los valores numéricos de la pantalla corresponden con precisión matemática al origen cartesiano (0, 0, 0). Arrastra cualquier figura para observar cómo cambian los vértices, el producto punto y el producto cruz.</p>
+      <p class="note">Al cambiar de eje con la lista o con el botón "Siguiente eje →", la interfaz actualiza automáticamente los vectores generadores y los vértices determinantes del producto punto.</p>
     </section>
   </aside>
 </div>
@@ -173,7 +173,12 @@ function verts3(o){
 
 function project(vertices,axis){
   let vals=vertices.map(p=>dot(p,axis));
-  return{min:Math.min(...vals),max:Math.max(...vals),vals};
+  let minIdx=0,maxIdx=0;
+  for(let i=1;i<vals.length;i++){
+    if(vals[i]<vals[minIdx])minIdx=i;
+    if(vals[i]>vals[maxIdx])maxIdx=i;
+  }
+  return{min:vals[minIdx],max:vals[maxIdx],minIdx,maxIdx,vals};
 }
 
 function testAxis(raw,name,va,vb){
@@ -387,7 +392,6 @@ function drawCartesian2D(){
 
 function drawCartesian3D(){
   ctx.save();
-  // Grilla en el plano del suelo Y = 0 (de -4 a 4 en X y Z)
   for(let x=-4;x<=4;x+=1){
     let p1=projectScreen([x,0,-4]),p2=projectScreen([x,0,4]);
     line(p1,p2,'#242c38',1);
@@ -398,17 +402,13 @@ function drawCartesian3D(){
   }
 
   // Ejes globales 3D desde el origen (0, 0, 0)
-  // Eje X (Rojo)
   arrow3D([0,0,0],[1,0,0],4.4,'#ef4444',2.5,9,'+X','#ef4444');
   arrow3D([0,0,0],[-1,0,0],4.4,'#ef444455',1.5,7,'-X','#ef444477');
-  // Eje Z (Azul)
   arrow3D([0,0,0],[0,0,1],4.4,'#3b82f6',2.5,9,'+Z','#3b82f6');
   arrow3D([0,0,0],[0,0,-1],4.4,'#3b82f655',1.5,7,'-Z','#3b82f677');
-  // Eje Y (Verde - vertical)
   arrow3D([0,0,0],[0,1,0],3.2,'#22c55e',2.5,9,'+Y','#22c55e');
   arrow3D([0,0,0],[0,-1,0],3.2,'#22c55e55',1.5,7,'-Y','#22c55e77');
 
-  // Graduaciones numéricas en los ejes X, Y, Z
   for(let val of [-3,-2,-1,1,2,3]){
     let ptX=projectScreen([val,0,0]);
     drawBadge(val.toString(),[ptX[0]+3,ptX[1]+3],'#ef4444','rgba(15,20,30,0.85)',9);
@@ -418,7 +418,6 @@ function drawCartesian3D(){
     drawBadge(val.toString(),[ptY[0]+3,ptY[1]+3],'#22c55e','rgba(15,20,30,0.85)',9);
   }
 
-  // Origen (0, 0, 0)
   let pOrig=projectScreen([0,0,0]);
   ctx.fillStyle='#f8fafc';
   ctx.beginPath();ctx.arc(pOrig[0],pOrig[1],4,0,Math.PI*2);ctx.fill();
@@ -450,21 +449,47 @@ function drawPoly(v,fill,stroke,label,obj){
   polygon(pts,fill,stroke);
   let cWorld=v.reduce((a,p)=>add(a,p),[0,0]).map(x=>x/v.length);
   let cScreen=projectScreen(cWorld);
+  let activeAxis=axes[selected];
 
-  if(showCoords){
-    drawBadge(`${label} (${Math.round(cWorld[0])}, ${Math.round(cWorld[1])})`,[cScreen[0]-25,cScreen[1]-10],'#ffffff','rgba(15,23,42,0.92)',11);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 15px system-ui';
+  ctx.textAlign='center';
+  ctx.fillText(label,cScreen[0],cScreen[1]+5);
+
+  if(showCoords && activeAxis){
+    let isA=label==='A';
+    let extInfo=isA?activeAxis.a:activeAxis.b;
+    let isOriginFig=activeAxis.origin&&activeAxis.origin.type==='edge'&&activeAxis.origin.label===label;
+    let edgeIdx=isOriginFig?activeAxis.origin.i:-1;
+
+    // Solo mostramos badges en los vértices que se usan en este cálculo:
+    // 1) Los vértices de la arista generadora P y Q (si este eje se originó en esta figura)
+    // 2) Los vértices determinantes de la proyección (min y max)
     v.forEach((p,i)=>{
+      let isMin=i===extInfo.minIdx;
+      let isMax=i===extInfo.maxIdx;
+      let isEdgeP=isOriginFig&&i===edgeIdx;
+      let isEdgeQ=isOriginFig&&i===(edgeIdx+1)%v.length;
+      let isUsed=isMin||isMax||isEdgeP||isEdgeQ;
+
       let ps=projectScreen(p);
-      ctx.fillStyle=label==='A'?'#42b9ff':'#ffb15a';
-      ctx.beginPath();ctx.arc(ps[0],ps[1],3.5,0,Math.PI*2);ctx.fill();
-      let coordTxt=`P${i+1}(${Math.round(p[0])}, ${Math.round(p[1])})`;
-      drawBadge(coordTxt,[ps[0]+5,ps[1]-5],label==='A'?'#42b9ff':'#ffb15a','rgba(15,20,30,0.9)',9.5);
+      ctx.fillStyle=isUsed?(isEdgeP||isEdgeQ?'#ffe066':(isA?'#42b9ff':'#ffb15a')):'rgba(255,255,255,0.22)';
+      ctx.beginPath();
+      ctx.arc(ps[0],ps[1],isUsed?4.5:2.2,0,Math.PI*2);
+      ctx.fill();
+
+      if(isUsed){
+        let tag='';
+        if(isEdgeP) tag=`P(${Math.round(p[0])}, ${Math.round(p[1])})`;
+        else if(isEdgeQ) tag=`Q(${Math.round(p[0])}, ${Math.round(p[1])})`;
+        else if(isMin) tag=`Min${label}(${Math.round(p[0])}, ${Math.round(p[1])}) → p=${fmt(extInfo.min)}`;
+        else if(isMax) tag=`Max${label}(${Math.round(p[0])}, ${Math.round(p[1])}) → p=${fmt(extInfo.max)}`;
+
+        if(tag){
+          drawBadge(tag,[ps[0]+6,ps[1]-6],isEdgeP||isEdgeQ?'#ffe066':(isA?'#42b9ff':'#ffb15a'),'rgba(15,20,30,0.92)',9.5);
+        }
+      }
     });
-  }else{
-    ctx.fillStyle='#fff';
-    ctx.font='bold 15px system-ui';
-    ctx.textAlign='center';
-    ctx.fillText(label,cScreen[0],cScreen[1]+5);
   }
 
   if(showFigureAxes){
@@ -475,21 +500,22 @@ function drawPoly(v,fill,stroke,label,obj){
     arrow2D(cScreen,pU1,label==='A'?'#76caff':'#fbbf24',2,7);
     arrow2D(cScreen,pU2,label==='A'?'#38bdf8':'#f59e0b',2,7);
 
+    // Solo resaltar la normal de la arista que se está usando
     v.forEach((p,i)=>{
       let q=v[(i+1)%v.length];
       let edge=sub(q,p);
       let norm=unit([-edge[1],edge[0]]);
       let mid=mul(add(p,q),0.5);
       let pMid=projectScreen(mid);
-      let pNorm=projectScreen(add(mid,mul(norm,24)));
-      let isActive=axes[selected]&&axes[selected].origin&&axes[selected].origin.type==='edge'&&axes[selected].origin.label===label&&axes[selected].origin.i===i;
+      let pNorm=projectScreen(add(mid,mul(norm,26)));
+      let isActive=activeAxis&&activeAxis.origin&&activeAxis.origin.type==='edge'&&activeAxis.origin.label===label&&activeAxis.origin.i===i;
       if(isActive){
         arrow2D(pMid,pNorm,'#ffe066',3.5,10);
         if(showCoords){
-          drawBadge(`n=(${fmt(norm[0])}, ${fmt(norm[1])})`,[pNorm[0]+6,pNorm[1]-6],'#ffe066','rgba(15,20,30,0.9)',9.5);
+          drawBadge(`normal n=(${fmt(norm[0])}, ${fmt(norm[1])})`,[pNorm[0]+6,pNorm[1]-6],'#ffe066','rgba(15,20,30,0.92)',9.5);
         }
       }else{
-        arrow2D(pMid,pNorm,'rgba(255,255,255,0.3)',1.2,5);
+        arrow2D(pMid,pNorm,'rgba(255,255,255,0.18)',1,4);
       }
     });
   }
@@ -502,25 +528,40 @@ function drawBox(o,color,label){
     polygon(f.ids.map(i=>projectScreen(v[i])),color==='a'?'rgba(66,185,255,.22)':'rgba(255,177,90,.22)',color==='a'?'#42b9ff':'#ffb15a');
   }
   let p=projectScreen(o.pos);
+  let activeAxis=axes[selected];
+  let isA=color==='a';
+  let extInfo=activeAxis?(isA?activeAxis.a:activeAxis.b):null;
 
-  if(showCoords){
-    drawBadge(`${label} [${o.pos.map(x=>Number(x).toFixed(2)).join(', ')}]`,[p[0]-35,p[1]-10],'#ffffff','rgba(15,23,42,0.92)',11);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 15px system-ui';
+  ctx.textAlign='center';
+  ctx.fillText(label,p[0],p[1]+5);
+
+  if(showCoords && extInfo){
+    // Mostramos badges ÚNICAMENTE en los vértices que se usan en el cálculo del eje:
+    // el vértice que genera Min y el vértice que genera Max
     v.forEach((vert,idx)=>{
       let ps=projectScreen(vert);
-      ctx.fillStyle=color==='a'?'#42b9ff':'#ffb15a';
-      ctx.beginPath();ctx.arc(ps[0],ps[1],3.5,0,Math.PI*2);ctx.fill();
-      let vTxt=`v${idx+1}[${vert.map(x=>Number(x).toFixed(1)).join(',')}]`;
-      drawBadge(vTxt,[ps[0]+5,ps[1]-5],color==='a'?'#42b9ff':'#ffb15a','rgba(15,20,30,0.88)',9);
+      let isMin=idx===extInfo.minIdx;
+      let isMax=idx===extInfo.maxIdx;
+      let isUsed=isMin||isMax;
+
+      ctx.fillStyle=isUsed?(isA?'#42b9ff':'#ffb15a'):'rgba(255,255,255,0.2)';
+      ctx.beginPath();
+      ctx.arc(ps[0],ps[1],isUsed?4.5:2.2,0,Math.PI*2);
+      ctx.fill();
+
+      if(isUsed){
+        let val=isMin?extInfo.min:extInfo.max;
+        let prefix=isMin?`Min${label}`:`Max${label}`;
+        let vTxt=`${prefix}[${vert.map(x=>Number(x).toFixed(2)).join(',')}] → p=${fmt(val)}`;
+        drawBadge(vTxt,[ps[0]+6,ps[1]-6],isA?'#42b9ff':'#ffb15a','rgba(15,20,30,0.92)',9.5);
+      }
     });
-  }else{
-    ctx.fillStyle='#fff';
-    ctx.font='bold 16px system-ui';
-    ctx.textAlign='center';
-    ctx.fillText(label,p[0],p[1]+5);
   }
 
   if(showFigureAxes){
-    drawFigureAxes3D(o,label,color==='a');
+    drawFigureAxes3D(o,label,isA);
   }
 }
 
@@ -537,9 +578,10 @@ function drawFigureAxes3D(o,label,isA){
     );
     let lenAxis=(o.half[i]+0.6);
     let col=active?'#ffd166':axisColors[i];
-    let strokeW=active?3.5:2;
-    let head=active?11:8;
-    let coordStr=showCoords?` [${b[i].map(x=>Number(x).toFixed(2)).join(',')}]`:'';
+    let strokeW=active?3.5:1.8;
+    let head=active?11:7;
+    // ÚNICAMENTE mostrar los valores numéricos del vector si es el que se usa en el cálculo actual
+    let coordStr=(showCoords && active)?` [${b[i].map(x=>Number(x).toFixed(3)).join(', ')}]`:'';
     arrow3D(center,b[i],lenAxis,col,strokeW,head,`${label}.${axisNames[i]}${coordStr}${active?' ★':''}`,col);
   }
 }
@@ -569,33 +611,31 @@ function drawAxis(axis,va,vb){
 
 function drawProjections3D(axis,center,va,vb){
   let n=axis.n;
-  let projA=va.map((v,idx)=>{
-    let t=dot(sub(v,center),n);
-    let scalar=dot(v,n);
-    return {v,idx:idx+1,scalar,q:add(center,mul(n,t))};
-  });
-  let projB=vb.map((v,idx)=>{
-    let t=dot(sub(v,center),n);
-    let scalar=dot(v,n);
-    return {v,idx:idx+1,scalar,q:add(center,mul(n,t))};
-  });
+  let projA=va.map((v,idx)=>({v,idx,scalar:dot(v,n),q:add(center,mul(n,dot(sub(v,center),n)))}));
+  let projB=vb.map((v,idx)=>({v,idx,scalar:dot(v,n),q:add(center,mul(n,dot(sub(v,center),n)))}));
 
-  projA.forEach(item=>{
+  // Proyecciones 3D: destacamos únicamente los vértices determinantes (mínimo y máximo)
+  projA.forEach((item,i)=>{
+    let isUsed=i===axis.a.minIdx||i===axis.a.maxIdx;
     let pv=projectScreen(item.v),pq=projectScreen(item.q);
-    line(pv,pq,'rgba(66,185,255,0.28)',1,[3,4]);
-    ctx.fillStyle='#42b9ff';
-    ctx.beginPath();ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);ctx.fill();
-    if(showCoords&&(Math.abs(item.scalar-axis.a.min)<1e-4||Math.abs(item.scalar-axis.a.max)<1e-4)){
-      drawBadge(`p${item.idx}=${fmt(item.scalar)}`,[pq[0]+4,pq[1]-4],'#42b9ff','rgba(10,15,25,0.85)',9);
+    line(pv,pq,isUsed?'rgba(66,185,255,0.7)':'rgba(66,185,255,0.12)',isUsed?1.8:1,isUsed?[]:[2,4]);
+    ctx.fillStyle=isUsed?'#42b9ff':'rgba(66,185,255,0.25)';
+    ctx.beginPath();ctx.arc(pq[0],pq[1],isUsed?3.5:2,0,Math.PI*2);ctx.fill();
+    if(showCoords && isUsed){
+      let label=i===axis.a.minIdx?'MinA':'MaxA';
+      drawBadge(`${label}=${fmt(item.scalar)}`,[pq[0]+5,pq[1]-5],'#42b9ff','rgba(10,15,25,0.92)',9.5);
     }
   });
-  projB.forEach(item=>{
+
+  projB.forEach((item,i)=>{
+    let isUsed=i===axis.b.minIdx||i===axis.b.maxIdx;
     let pv=projectScreen(item.v),pq=projectScreen(item.q);
-    line(pv,pq,'rgba(255,177,90,0.28)',1,[3,4]);
-    ctx.fillStyle='#ffb15a';
-    ctx.beginPath();ctx.arc(pq[0],pq[1],2.5,0,Math.PI*2);ctx.fill();
-    if(showCoords&&(Math.abs(item.scalar-axis.b.min)<1e-4||Math.abs(item.scalar-axis.b.max)<1e-4)){
-      drawBadge(`p${item.idx}=${fmt(item.scalar)}`,[pq[0]+4,pq[1]-4],'#ffb15a','rgba(10,15,25,0.85)',9);
+    line(pv,pq,isUsed?'rgba(255,177,90,0.7)':'rgba(255,177,90,0.12)',isUsed?1.8:1,isUsed?[]:[2,4]);
+    ctx.fillStyle=isUsed?'#ffb15a':'rgba(255,177,90,0.25)';
+    ctx.beginPath();ctx.arc(pq[0],pq[1],isUsed?3.5:2,0,Math.PI*2);ctx.fill();
+    if(showCoords && isUsed){
+      let label=i===axis.b.minIdx?'MinB':'MaxB';
+      drawBadge(`${label}=${fmt(item.scalar)}`,[pq[0]+5,pq[1]-5],'#ffb15a','rgba(10,15,25,0.92)',9.5);
     }
   });
 
@@ -606,13 +646,6 @@ function drawProjections3D(axis,center,va,vb){
   let pB2=projectScreen(add(center,mul(n,axis.b.max-cDotN)));
   line(pA1,pA2,'#42b9ff',7);
   line(pB1,pB2,'#ffb15a',7);
-
-  if(showCoords){
-    drawBadge(`MinA=${fmt(axis.a.min)}`,[pA1[0],pA1[1]-14],'#42b9ff','rgba(10,15,25,0.85)',9.5);
-    drawBadge(`MaxA=${fmt(axis.a.max)}`,[pA2[0],pA2[1]+14],'#42b9ff','rgba(10,15,25,0.85)',9.5);
-    drawBadge(`MinB=${fmt(axis.b.min)}`,[pB1[0],pB1[1]-14],'#ffb15a','rgba(10,15,25,0.85)',9.5);
-    drawBadge(`MaxB=${fmt(axis.b.max)}`,[pB2[0],pB2[1]+14],'#ffb15a','rgba(10,15,25,0.85)',9.5);
-  }
 }
 
 function drawIntervals(axis,origin,u,factor,va,vb){
@@ -628,21 +661,23 @@ function drawIntervals(axis,origin,u,factor,va,vb){
     ctx.arc(...x,5,0,Math.PI*2);
     ctx.fill();
   }
-  for(let v of va){
+  va.forEach((v,i)=>{
+    let isUsed=i===a.minIdx||i===a.maxIdx;
     let pt=point(dot(v,axis.n),-12);
-    line(projectScreen(v),pt,'#42b9ff44',1,[3,5]);
-  }
-  for(let v of vb){
+    line(projectScreen(v),pt,isUsed?'#42b9ff88':'#42b9ff22',isUsed?1.5:1,isUsed?[]:[2,4]);
+  });
+  vb.forEach((v,i)=>{
+    let isUsed=i===b.minIdx||i===b.maxIdx;
     let pt=point(dot(v,axis.n),12);
-    line(projectScreen(v),pt,'#ffb15a44',1,[3,5]);
-  }
+    line(projectScreen(v),pt,isUsed?'#ffb15a88':'#ffb15a22',isUsed?1.5:1,isUsed?[]:[2,4]);
+  });
   if(showCoords){
     let pMinA=point(a.min,-24),pMaxA=point(a.max,-24);
     let pMinB=point(b.min,24),pMaxB=point(b.max,24);
-    drawBadge(`MinA=${fmt(a.min)}`,pMinA,'#42b9ff','rgba(15,20,30,0.9)',9.5);
-    drawBadge(`MaxA=${fmt(a.max)}`,pMaxA,'#42b9ff','rgba(15,20,30,0.9)',9.5);
-    drawBadge(`MinB=${fmt(b.min)}`,pMinB,'#ffb15a','rgba(15,20,30,0.9)',9.5);
-    drawBadge(`MaxB=${fmt(b.max)}`,pMaxB,'#ffb15a','rgba(15,20,30,0.9)',9.5);
+    drawBadge(`MinA=${fmt(a.min)}`,pMinA,'#42b9ff','rgba(15,20,30,0.92)',9.5);
+    drawBadge(`MaxA=${fmt(a.max)}`,pMaxA,'#42b9ff','rgba(15,20,30,0.92)',9.5);
+    drawBadge(`MinB=${fmt(b.min)}`,pMinB,'#ffb15a','rgba(15,20,30,0.92)',9.5);
+    drawBadge(`MaxB=${fmt(b.max)}`,pMaxB,'#ffb15a','rgba(15,20,30,0.92)',9.5);
   }
   return point;
 }
@@ -745,21 +780,21 @@ function drawOrigin(axis){
 function originText(o,axis,va,vb){
   if(!o)return '';
   if(o.type==='edge'){
-    let dotCalcsA=va.map((v,i)=>`  v${i+1}(${Math.round(v[0])}, ${Math.round(v[1])}) · n = (${fmt(v[0])}*${fmt(axis.n[0])}) + (${fmt(v[1])}*${fmt(axis.n[1])}) = ${fmt(dot(v,axis.n))}`).join('\n');
-    let dotCalcsB=vb.map((v,i)=>`  v${i+1}(${Math.round(v[0])}, ${Math.round(v[1])}) · n = (${fmt(v[0])}*${fmt(axis.n[0])}) + (${fmt(v[1])}*${fmt(axis.n[1])}) = ${fmt(dot(v,axis.n))}`).join('\n');
-    return `ORIGEN GEOMÉTRICO (2D · PLANO CARTESIANO)\nFigura ${o.label}, arista ${o.i+1}\nPunto inicial P = (${fmt(o.p[0])}, ${fmt(o.p[1])})\nPunto final   Q = (${fmt(o.q[0])}, ${fmt(o.q[1])})\nVector arista e = Q - P = (${fmt(o.edge[0])}, ${fmt(o.edge[1])})\nNormal perpendicular (-e.y, e.x) = (${fmt(-o.edge[1])}, ${fmt(o.edge[0])})\nMagnitud ||normal|| = ${fmt(Math.hypot(o.edge[0],o.edge[1]))}\nVector unitario n = normal / ||normal|| = ${vec(axis.n)}\n\nCÁLCULO DEL PRODUCTO PUNTO PASO A PASO (p = v · n):\nProyecciones Figura A:\n${dotCalcsA}\n\nProyecciones Figura B:\n${dotCalcsB}`;
+    let minA=va[axis.a.minIdx],maxA=va[axis.a.maxIdx];
+    let minB=vb[axis.b.minIdx],maxB=vb[axis.b.maxIdx];
+    return `EJE ACTIVO EN REVISIÓN (2D)\nFigura ${o.label}, arista ${o.i+1}\n\n1. VALORES GENERADORES DEL EJE:\n   Punto P = (${fmt(o.p[0])}, ${fmt(o.p[1])})\n   Punto Q = (${fmt(o.q[0])}, ${fmt(o.q[1])})\n   Vector arista e = Q - P = (${fmt(o.edge[0])}, ${fmt(o.edge[1])})\n   Normal unitario n = (${fmt(axis.n[0])}, ${fmt(axis.n[1])})\n\n2. VÉRTICES DETERMINANTES DE LA PROYECCIÓN:\n   MinA: v${axis.a.minIdx+1}(${Math.round(minA[0])}, ${Math.round(minA[1])}) · n = ${fmt(axis.a.min)}\n   MaxA: v${axis.a.maxIdx+1}(${Math.round(maxA[0])}, ${Math.round(maxA[1])}) · n = ${fmt(axis.a.max)}\n   MinB: v${axis.b.minIdx+1}(${Math.round(minB[0])}, ${Math.round(minB[1])}) · n = ${fmt(axis.b.min)}\n   MaxB: v${axis.b.maxIdx+1}(${Math.round(maxB[0])}, ${Math.round(maxB[1])}) · n = ${fmt(axis.b.max)}`;
   }
   if(o.type==='face'){
-    let dotCalcsA=va.map((v,i)=>`  v${i+1}[${v.map(fmt).join(', ')}] · n = ${fmt(dot(v,axis.n))}`).join('\n');
-    let dotCalcsB=vb.map((v,i)=>`  v${i+1}[${v.map(fmt).join(', ')}] · n = ${fmt(dot(v,axis.n))}`).join('\n');
-    return `ORIGEN GEOMÉTRICO (3D · NORMAL DE CARA)\nCaja ${o.label}, vector eje local ${'XYZ'[o.i]}\nVector unitario del eje n = ${vec(axis.n)}\nEn una OBB, este vector es perpendicular a un par de caras paralelas.\n\nCÁLCULO DEL PRODUCTO PUNTO (p = v · n):\nProyecciones Caja A:\n${dotCalcsA}\n\nProyecciones Caja B:\n${dotCalcsB}`;
+    let minA=va[axis.a.minIdx],maxA=va[axis.a.maxIdx];
+    let minB=vb[axis.b.minIdx],maxB=vb[axis.b.maxIdx];
+    return `EJE ACTIVO EN REVISIÓN (3D · NORMAL DE CARA)\nCaja ${o.label}, eje local ${'XYZ'[o.i]}\n\n1. VALOR DEL VECTOR NORMAL:\n   n = ${o.label}.${'XYZ'[o.i]} = ${vec(axis.n)}\n\n2. VÉRTICES DETERMINANTES DE LA PROYECCIÓN:\n   MinA: v${axis.a.minIdx+1}[${minA.map(fmt).join(', ')}] · n = ${fmt(axis.a.min)}\n   MaxA: v${axis.a.maxIdx+1}[${maxA.map(fmt).join(', ')}] · n = ${fmt(axis.a.max)}\n   MinB: v${axis.b.minIdx+1}[${minB.map(fmt).join(', ')}] · n = ${fmt(axis.b.min)}\n   MaxB: v${axis.b.maxIdx+1}[${maxB.map(fmt).join(', ')}] · n = ${fmt(axis.b.max)}`;
   }
   let c=cross(o.u,o.v);
   let magC=len(c);
-  let dotCalcsA=va.map((v,i)=>`  v${i+1}[${v.map(x=>Number(x).toFixed(2)).join(',')}] · n = (${fmt(v[0])}*${fmt(axis.n[0])})+(${fmt(v[1])}*${fmt(axis.n[1])})+(${fmt(v[2])}*${fmt(axis.n[2])}) = ${fmt(dot(v,axis.n))}`).join('\n');
-  let dotCalcsB=vb.map((v,i)=>`  v${i+1}[${v.map(x=>Number(x).toFixed(2)).join(',')}] · n = (${fmt(v[0])}*${fmt(axis.n[0])})+(${fmt(v[1])}*${fmt(axis.n[1])})+(${fmt(v[2])}*${fmt(axis.n[2])}) = ${fmt(dot(v,axis.n))}`).join('\n');
+  let minA=va[axis.a.minIdx],maxA=va[axis.a.maxIdx];
+  let minB=vb[axis.b.minIdx],maxB=vb[axis.b.maxIdx];
 
-  return `ORIGEN GEOMÉTRICO (3D · PRODUCTO CRUZ)\n${'─'.repeat(42)}\n1. VECTORES GENERADORES DE ARISTAS (CARTESIANO):\n   Arista Caja A (u) = ${vec(o.u)}  [Eje local A.${'XYZ'[o.i]}]\n   Arista Caja B (v) = ${vec(o.v)}  [Eje local B.${'XYZ'[o.j]}]\n\n2. PRODUCTO CRUZ (Cross Product):\n   Cx = (uy * vz) - (uz * vy) = (${fmt(o.u[1])}*${fmt(o.v[2])}) - (${fmt(o.u[2])}*${fmt(o.v[1])}) = ${fmt(c[0])}\n   Cy = (uz * vx) - (ux * vz) = (${fmt(o.u[2])}*${fmt(o.v[0])}) - (${fmt(o.u[0])}*${fmt(o.v[2])}) = ${fmt(c[1])}\n   Cz = (ux * vy) - (uy * vx) = (${fmt(o.u[0])}*${fmt(o.v[1])}) - (${fmt(o.u[1])}*${fmt(o.v[0])}) = ${fmt(c[2])}\n   Vector C = u × v = ${vec(c)}\n   Magnitud ||C|| = sqrt(Cx² + Cy² + Cz²) = ${fmt(magC)}\n\n3. VECTOR UNITARIO RESULTANTE (Eje de proyección SAT):\n   n = C / ||C|| = ${vec(axis.n)}\n   Propiedad: n ⊥ u y n ⊥ v.\n\n4. CÁLCULO DEL PRODUCTO PUNTO PARA CADA VÉRTICE (p = v · n):\nProyecciones Caja A:\n${dotCalcsA}\n\nProyecciones Caja B:\n${dotCalcsB}`;
+  return `EJE ACTIVO EN REVISIÓN (3D · PRODUCTO CRUZ)\n${'─'.repeat(42)}\n1. VALORES QUE GENERAN EL PRODUCTO CRUZ:\n   Vector u (Caja A, eje ${'XYZ'[o.i]}) = ${vec(o.u)}\n   Vector v (Caja B, eje ${'XYZ'[o.j]}) = ${vec(o.v)}\n   C = u × v = [ (${fmt(o.u[1])}*${fmt(o.v[2])}) - (${fmt(o.u[2])}*${fmt(o.v[1])}),\n                 (${fmt(o.u[2])}*${fmt(o.v[0])}) - (${fmt(o.u[0])}*${fmt(o.v[2])}),\n                 (${fmt(o.u[0])}*${fmt(o.v[1])}) - (${fmt(o.u[1])}*${fmt(o.v[0])}) ]\n   C = ${vec(c)}   (||C|| = ${fmt(magC)})\n   Vector unitario n = C / ||C|| = ${vec(axis.n)}\n\n2. VÉRTICES DETERMINANTES DEL INTERVALO [Min, Max]:\n   MinA: v${axis.a.minIdx+1}[${minA.map(fmt).join(', ')}] · n = ${fmt(axis.a.min)}\n   MaxA: v${axis.a.maxIdx+1}[${maxA.map(fmt).join(', ')}] · n = ${fmt(axis.a.max)}\n   MinB: v${axis.b.minIdx+1}[${minB.map(fmt).join(', ')}] · n = ${fmt(axis.b.min)}\n   MaxB: v${axis.b.maxIdx+1}[${maxB.map(fmt).join(', ')}] · n = ${fmt(axis.b.max)}`;
 }
 
 function render(va,vb){
@@ -779,7 +814,7 @@ function render(va,vb){
   ctx.fillStyle='#aeb9c7';
   ctx.font='12px system-ui';
   ctx.textAlign='left';
-  ctx.fillText(mode===2?'SAT 2D · Plano Cartesiano y Normales de arista':'SAT 3D · Espacio Cartesiano 3D y 15 Ejes potenciales',18,25);
+  ctx.fillText(mode===2?'SAT 2D · Plano Cartesiano y Valores del Eje':'SAT 3D · Espacio Cartesiano 3D y Valores del Eje',18,25);
   ctx.fillStyle=collision?'#ff7f8b':'#73e4aa';
   ctx.fillText(collision?'TODOS LOS EJES SE SOLAPAN (COLISIÓN)':'EXISTE AL MENOS UN EJE SEPARADOR (SIN CHOQUE)',18,44);
 }
@@ -803,7 +838,7 @@ function update(){
     let sep1=a.a.max<a.b.min-1e-8,sep2=a.b.max<a.a.min-1e-8;
     let distSep=a.sep?(a.a.max<a.b.min?a.b.min-a.a.max:a.a.min-a.b.max):0;
     let distOver=!a.sep?Math.min(a.a.max,a.b.max)-Math.max(a.a.min,a.b.min):0;
-    $('console').textContent=`MODO ${mode}D · EJE #${selected+1}: ${a.name}\n${'─'.repeat(42)}\n${originText(a.origin,a,va,vb)}\n\nNormal unitario n = ${vec(a.n)}\n\nINTERVALOS RESULTANTES EN LA RECTA n:\n  MinA = ${fmt(a.a.min)}\n  MaxA = ${fmt(a.a.max)}  →  Intervalo A: [${fmt(a.a.min)}, ${fmt(a.a.max)}]\n  MinB = ${fmt(a.b.min)}\n  MaxB = ${fmt(a.b.max)}  →  Intervalo B: [${fmt(a.b.min)}, ${fmt(a.b.max)}]\n\nEVALUACIÓN DE SEPARACIÓN:\n  (MaxA < MinB) || (MaxB < MinA)\n  (${fmt(a.a.max)} < ${fmt(a.b.min)}) || (${fmt(a.b.max)} < ${fmt(a.a.min)})\n  ${sep1} || ${sep2} = ${a.sep}\n\nDistancia de ${a.sep?'separación gap':'solapamiento'}: ${fmt(a.sep?distSep:distOver)} u\nResultado del eje: ${a.sep?'SEPARACIÓN ✓ (Eje separador encontrado)':'SOLAPAMIENTO ✕'}\nResultado global: ${collision?'COLISIÓN DETECTADA':'OBJETOS SEPARADOS'}`;
+    $('console').textContent=`EJE #${selected+1}: ${a.name}\n${'─'.repeat(42)}\n${originText(a.origin,a,va,vb)}\n\n3. INTERVALOS DETERMINANTES EN LA RECTA n:\n   Intervalo A: [${fmt(a.a.min)}, ${fmt(a.a.max)}]\n   Intervalo B: [${fmt(a.b.min)}, ${fmt(a.b.max)}]\n\n4. EVALUACIÓN DE SEPARACIÓN:\n   (${fmt(a.a.max)} < ${fmt(a.b.min)}) || (${fmt(a.b.max)} < ${fmt(a.a.min)})\n   ${sep1} || ${sep2} = ${a.sep}\n\nDistancia de ${a.sep?'separación gap':'solapamiento'}: ${fmt(a.sep?distSep:distOver)} u\nResultado del eje: ${a.sep?'SEPARACIÓN ✓ (Eje separador)' : 'SOLAPAMIENTO ✕'}\nResultado global: ${collision?'COLISIÓN DETECTADA':'OBJETOS SEPARADOS'}`;
   }
   render(va,vb);
 }
@@ -920,7 +955,7 @@ $('toggleGrid').onclick=()=>{
 $('toggleCoords').onclick=()=>{
   showCoords=!showCoords;
   $('toggleCoords').classList.toggle('active',showCoords);
-  $('toggleCoords').textContent=`Valores numéricos: ${showCoords?'ON':'OFF'}`;
+  $('toggleCoords').textContent=`Valores del cálculo: ${showCoords?'ON':'OFF'}`;
   update();
 };
 $('toggleAxes').onclick=()=>{
